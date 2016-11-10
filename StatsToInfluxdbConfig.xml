@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration>
+	<Influxdb>
+		<InfluxdbHTTPProtocol>http</InfluxdbHTTPProtocol>
+		<InfluxdbServer>asintlhp01.gmcloudhp.ggl.inet</InfluxdbServer>
+		<InfluxdbHTTPPort>8086</InfluxdbHTTPPort>
+		<InfluxdbDatabase>win_powershell</InfluxdbDatabase>
+		<NodeHostName>$env:COMPUTERNAME</NodeHostName>
+		<MetricSendIntervalSeconds>10</MetricSendIntervalSeconds>
+		<SendUsingUDP>False</SendUsingUDP>
+		<HostTagName>host</HostTagName>
+		<CounterInstanceTagName>instance</CounterInstanceTagName>
+	</Influxdb>
+	<Measurements>
+		<Measurement Name="win_cpu">
+			<MeasurementTags>
+				<Tag Name="objectname" Value="Processor"/>
+			</MeasurementTags>
+			<MeasurementFields>
+				<Field Name="Percent_Idle_Time" Counter="\Processeur(*)\% d’inactivité"/>
+				<Field Name="Percent_Interrupt_Time" Counter="\Processeur(*)\% temps d’interruption"/>
+				<Field Name="Percent_Privileged_Time" Counter="\Processeur(*)\% temps privilégié"/>
+				<Field Name="Percent_Processor_Time" Counter="\Processeur(*)\% temps processeur"/>
+				<Field Name="Percent_User_Time" Counter="\Processeur(*)\% temps utilisateur"/>
+			</MeasurementFields>
+			<SkipTotal>False</SkipTotal>
+		</Measurement>
+		<Measurement Name="win_disk">
+			<MeasurementTags>
+				<Tag Name="objectname" Value="LogicalDisk"/>
+			</MeasurementTags>
+			<MeasurementFields>
+				<Field Name="Free_Megabytes" Counter="\Disque logique(*)\Mégaoctets libres"/>
+				<Field Name="Current_Disk_Queue_Length" Counter="\Disque logique(*)\Taille de file d’attente du disque actuelle"/>
+				<Field Name="Percent_Disk_Read_Time" Counter="\Disque logique(*)\Pourcentage du temps de lecture du disque"/>
+				<Field Name="Percent_Disk_Time" Counter="\Disque logique(*)\Pourcentage du temps disque"/>
+				<Field Name="Percent_Disk_Write_Time" Counter="\Disque logique(*)\Pourcentage du temps écriture du disque"/>
+				<Field Name="Percent_Free_Space" Counter="\Disque logique(*)\% d’espace libre"/>
+				<Field Name="Percent_Idle_Time" Counter="\Disque logique(*)\% d’inactivité"/>
+			</MeasurementFields>
+			<SkipTotal>True</SkipTotal>
+		</Measurement>
+		<Measurement Name="win_disk">
+			<MeasurementTags>
+				<Tag Name="objectname" Value="PhysicalDisk"/>
+			</MeasurementTags>
+			<MeasurementFields>
+				<Field Name="Avg._Disk_sec/Write" Counter="\Disque physique(*)\Moyenne disque s/écriture"/>
+				<Field Name="Avg._Disk_sec/Read" Counter="\Disque physique(*)\Moyenne disque s/lecture"/>
+				<Field Name="Current_Disk_Queue_Length" Counter="\Disque physique(*)\Taille de file d’attente du disque actuelle"/>
+				<Field Name="Percent_Idle_Time" Counter="\Disque physique(*)\% d’inactivité"/>
+			</MeasurementFields>
+			<SkipTotal>False</SkipTotal>
+		</Measurement>
+		<Measurement Name="win_system">
+			<MeasurementTags>
+				<Tag Name="objectname" Value="System"/>
+			</MeasurementTags>
+			<MeasurementFields>
+				<Field Name="Processor_Queue_Length" Counter="\Système\Longueur de la file du processeur"/>
+				<Field Name="Processus" Counter="\Système\Processus"/>
+				<Field Name="Threads" Counter="\Système\Threads"/>
+			</MeasurementFields>
+			<SkipTotal>False</SkipTotal>
+		</Measurement>
+		<Measurement Name="win_mem">
+			<MeasurementTags>
+				<Tag Name="objectname" Value="Memory"/>
+			</MeasurementTags>
+			<MeasurementFields>
+				<Field Name="Available_MByte" Counter="\Mémoire\Mégaoctets disponibles"/>
+				<Field Name="Percent_Committed_Bytes_In_Use" Counter="\Mémoire\Pourcentage d’octets dédiés utilisés"/>
+				<Field Name="Pages_persec" Counter="\Mémoire\Pages/s"/>
+				<Field Name="Pages_Input_persec" Counter="\Mémoire\Pages en entrée/s"/>
+				<Field Name="Pages_Output_persec" Counter="\Mémoire\Pages en sortie/s"/>
+				<Field Name="Page_Faults_persec" Counter="\Mémoire\Défauts de page/s"/>
+			</MeasurementFields>
+			<SkipTotal>False</SkipTotal>
+		</Measurement>
+		<Measurement Name="win_net">
+			<MeasurementTags>
+				<Tag Name="objectname" Value="Network Interface"/>
+			</MeasurementTags>
+			<MeasurementFields>
+				<Field Name="Bytes_Total_persec" Counter="\Interface réseau(*)\Total des octets/s"/>
+				<Field Name="Bytes_Sent_persec" Counter="\Interface réseau(*)\Octets envoyés/s"/>
+				<Field Name="Bytes_Received_persec" Counter="\Interface réseau(*)\Octets reçus/s"/>
+				<Field Name="Current_Bandwidth" Counter="\Interface réseau(*)\Bande passante actuelle"/>
+				<Field Name="Output_Queue_Length" Counter="\Interface réseau(*)\Longueur de la file d’attente de sortie"/>
+			</MeasurementFields>
+			<SkipTotal>False</SkipTotal>
+		</Measurement>
+		<Measurement Name="win_swap">
+			<MeasurementTags>
+				<Tag Name="objectname" Value="Paging File"/>
+			</MeasurementTags>
+			<MeasurementFields>
+				<Field Name="Percent_Usage" Counter="\Fichier d’échange(*)\Pourcentage d’utilisation"/>
+				<Field Name="Percent_Usage_Peak" Counter="\Fichier d’échange(*)\Usage maximal"/>
+			</MeasurementFields>
+			<SkipTotal>False</SkipTotal>
+		</Measurement>
+	</Measurements>
+	<Logging>
+		<VerboseOutput>True</VerboseOutput>
+	</Logging>
+</Configuration>
