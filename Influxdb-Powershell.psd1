@@ -26,7 +26,7 @@ CompanyName = 'https://github.com/vsavornin/Influxdb-Powershell'
 Description = 'Powershell script to send Windows Performance counters to a InfluxDB Server, all configurable from a simple XML file. Based on MattHodge PowerShell Functions for Graphite (https://github.com/MattHodge/Graphite-PowerShell-Functions)'
 
 # Minimum version of the Windows PowerShell engine required by this module
-# PowerShellVersion = ''
+# PowerShellVersion = '2.0'
 
 # Name of the Windows PowerShell host required by this module
 # PowerShellHostName = ''

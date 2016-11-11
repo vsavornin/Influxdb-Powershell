@@ -61,10 +61,6 @@ Function Start-MeasurementsToInfluxdb
 
     $configFileLastWrite = (Get-Item -Path $ConfigFile).LastWriteTime
 
-    if($ExcludePerfCounters -and -not $SqlMetrics) {
-        throw "Parameter combination provided will prevent any metrics from being collected"
-    }
-
     # Start Endless Loop
     while ($true)
     {
@@ -93,8 +89,9 @@ Function Start-MeasurementsToInfluxdb
             {
                 foreach ($field_key in $Config.Measurements[$measurement_key]["fields"].Keys)
                 {
-                    $mapping_field_measurement[$field_key] = $measurement_key
-                    $mapping_counter_field[$Config.Measurements[$measurement_key]["fields"][$field_key]] = $field_key
+                    # Tag temporarely with Measurement Name to avoid bad mapping if there are multiple fields with same name accross different measurements
+                    $mapping_field_measurement[$measurement_key + "#" + $field_key] = $measurement_key
+                    $mapping_counter_field[$Config.Measurements[$measurement_key]["fields"][$field_key]] = $measurement_key + "#" + $field_key
                 }
             }
 
@@ -129,7 +126,7 @@ Function Start-MeasurementsToInfluxdb
                         break
                     }
                 }
-                Write-Verbose "GET $curr_field FROM $($sample.Path)"
+                # Write-Verbose "GET $curr_field FROM $($sample.Path)"
 
                 # Get the Influxdb Measurement from the Field discovered
                 $curr_measurement = $mapping_field_measurement[$curr_field]
@@ -151,21 +148,21 @@ Function Start-MeasurementsToInfluxdb
                 }
                 else
                 {
+                    # Init Hashes if new Measurement
                     if($measurements[$curr_measurement] -eq $null) { $measurements[$curr_measurement] = @{} }
+
+                    # Init Hashes if new Instance
                     if($measurements[$curr_measurement][$curr_instance] -eq $null) { $measurements[$curr_measurement][$curr_instance] = @{} }
+
+                    # Remove Measurement Name
+                    $curr_field = $curr_field -replace "^.*#",""
+
+                    # Feed the measurements Hash
                     $measurements[$curr_measurement][$curr_instance][$curr_field] = $curr_value
-                    Write-Verbose "To send : $($curr_measurement)[$($curr_instance)].$($curr_field) = $($curr_value)"
+                    #Write-Verbose "To send : $($curr_measurement)[$($curr_instance)].$($curr_field) = $($curr_value)"
                 }
             }
-            #DEBUG
-            # $measurements | Format-Table | Out-String
-            # $measurements["win_cpu"] | Format-Table | Out-String
-            # $measurements["win_cpu"]["0"] | Format-Table | Out-String
-            # $measurements["win_cpu"]["1"] | Format-Table | Out-String
-            # $measurements["win_cpu"]["_Total"] | Format-Table | Out-String
-            # $measurements["win_mem"]["-"] | Format-Table | Out-String
-
-        }# end Endless loop
+        }
 
         $line_protocol_measurements = @()
         # Create the final metrics to send in Line Protocol Format
@@ -200,7 +197,6 @@ Function Start-MeasurementsToInfluxdb
             "DbName" = $Config.InfluxdbDatabase
             "Username" = $null
             "Password" = $null
-            # "LineProtocolMeasurements" = $line_protocol_measurements -join [System.Environment]::NewLine
             "LineProtocolMeasurements" = $line_protocol_measurements -join "`n"
             "TestMode" = $TestMode
         }
