@@ -9,7 +9,7 @@
 ModuleToProcess = 'Influxdb-Powershell.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.0.0'
+ModuleVersion = '0.1.0'
 
 # ID used to uniquely identify this module
 GUID = '94de0e0a-8107-4e88-abd1-79cb71613922'
