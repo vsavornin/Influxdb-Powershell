@@ -23,7 +23,7 @@ CompanyName = 'https://github.com/vsavornin/Influxdb-Powershell'
 # Copyright statement for this module
 
 # Description of the functionality provided by this module
-Description = 'Powershell script to send Windows Performance counters to a InfluxDB Server, all configurable from a simple XML file. Based from MattHodge PowerShell Functions with Graphite (https://github.com/MattHodge/Graphite-PowerShell-Functions)'
+Description = 'Powershell script to send Windows Performance counters to a InfluxDB Server, all configurable from a simple XML file. Based on MattHodge PowerShell Functions for Graphite (https://github.com/MattHodge/Graphite-PowerShell-Functions)'
 
 # Minimum version of the Windows PowerShell engine required by this module
 # PowerShellVersion = ''
