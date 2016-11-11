@@ -69,17 +69,6 @@ Function Import-XMLConfig
 	# Get the Counter's Instance Tag Name to use for the metrics from the config file
     $Config.CounterInstanceTagName = $xmlfile.Configuration.Influxdb.CounterInstanceTagName
 	
-# ===>>> CHANGE THIS TO LOOP OVER THE NEW XML STRUCTURE
-
-    # # Create the Performance Counters Array
-    # $Config.Counters = @()
-
-    # # Load each row from the configuration file into the counter array
-    # foreach ($counter in $xmlfile.Configuration.PerformanceCounters.Counter)
-    # {
-        # $Config.Counters += $counter.Name
-    # }
-	
 	#Create the Measurements Hash
 	$Config.Measurements = @{}
 	
@@ -113,68 +102,6 @@ Function Import-XMLConfig
 	# $Config.Measurements["win_cpu"] | Format-Table | Out-String
 	# $Config.Measurements["win_cpu"]["tags"] | Format-Table | Out-String
 	# $Config.Measurements["win_cpu"]["fields"] | Format-Table | Out-String
-	
-# END ===>>> CHANGE THIS TO LOOP OVER THE NEW XML STRUCTURE
-
-
-
-    # # Create the Metric Cleanup Hashtable
-    # $Config.MetricReplace = New-Object System.Collections.Specialized.OrderedDictionary
-
-    # # Load metric cleanup config
-    # ForEach ($metricreplace in $xmlfile.Configuration.MetricCleaning.MetricReplace)
-    # {
-        # # Load each MetricReplace into an array
-        # $Config.MetricReplace.Add($metricreplace.This,$metricreplace.With)
-    # }
-
-    # $Config.Filters = [string]::Empty;
-    # # Load each row from the configuration file into the counter array
-    # foreach ($MetricFilter in $xmlfile.Configuration.Filtering.MetricFilter)
-    # {
-        # $Config.Filters += $MetricFilter.Name + '|'
-    # }
-
-    # if($Config.Filters.Length -gt 0) {
-        # # Trim trailing and leading white spaces
-        # $Config.Filters = $Config.Filters.Trim()
-
-        # # Strip the Last Pipe From the filters string so regex can work against the string.
-        # $Config.Filters = $Config.Filters.TrimEnd("|")
-    # }
-    # else
-    # {
-        # $Config.Filters = $null
-    # }
-
-    # Doesn't throw errors if users decide to delete the SQL section from the XML file. Issue #32.
-    try
-    {
-        # Below is for SQL Metrics
-        $Config.MSSQLMetricPath = $xmlfile.Configuration.MSSQLMetics.MetricPath
-        [int]$Config.MSSQLMetricSendIntervalSeconds = $xmlfile.Configuration.MSSQLMetics.MetricSendIntervalSeconds
-        $Config.MSSQLMetricTimeSpan = [timespan]::FromSeconds($Config.MSSQLMetricSendIntervalSeconds)
-        [int]$Config.MSSQLConnectTimeout = $xmlfile.Configuration.MSSQLMetics.SQLConnectionTimeoutSeconds
-        [int]$Config.MSSQLQueryTimeout = $xmlfile.Configuration.MSSQLMetics.SQLQueryTimeoutSeconds
-
-        # Create the Performance Counters Array
-        $Config.MSSQLServers = @()     
-     
-        foreach ($sqlServer in $xmlfile.Configuration.MSSQLMetics)
-        {
-            # Load each SQL Server into an array
-            $Config.MSSQLServers += [pscustomobject]@{
-                ServerInstance = $sqlServer.ServerInstance;
-                Username = $sqlServer.Username;
-                Password = $sqlServer.Password;
-                Queries = $sqlServer.Query
-            }
-        }
-    }
-    catch
-    {
-        Write-Verbose "SQL configuration has been left out, skipping."
-    }
 
     Return $Config
 }
@@ -208,60 +135,60 @@ function PSUsing
 }
 
 # ===>>> CHANGE THIS TO SEND TO INFLUXDB
-function SendMetrics
-{
-    param (
-        [string]$InfluxdbServer,
-        [int]$InfluxdbHTTPPort,
-        [string[]]$Metrics,
-        [switch]$IsUdp = $false,
-        [switch]$TestMode = $false
-    )
+# function SendMetrics
+# {
+    # param (
+        # [string]$InfluxdbServer,
+        # [int]$InfluxdbHTTPPort,
+        # [string[]]$Metrics,
+        # [switch]$IsUdp = $false,
+        # [switch]$TestMode = $false
+    # )
 
-    if (!($TestMode))
-    {
-        try
-        {
-            if ($isUdp)
-            {
-                PSUsing ($udpobject = new-Object system.Net.Sockets.Udpclient($InfluxdbServer, $InfluxdbHTTPPort)) -ScriptBlock {
-                    $enc = new-object system.text.asciiencoding
-                    foreach ($metricString in $Metrics)
-                    {
-                        $Message += "$($metricString)`n"
-                    }
-                    $byte = $enc.GetBytes($Message)
+    # if (!($TestMode))
+    # {
+        # try
+        # {
+            # if ($isUdp)
+            # {
+                # PSUsing ($udpobject = new-Object system.Net.Sockets.Udpclient($InfluxdbServer, $InfluxdbHTTPPort)) -ScriptBlock {
+                    # $enc = new-object system.text.asciiencoding
+                    # foreach ($metricString in $Metrics)
+                    # {
+                        # $Message += "$($metricString)`n"
+                    # }
+                    # $byte = $enc.GetBytes($Message)
 
-                    Write-Verbose "Byte Length: $($byte.Length)"
-                    $Sent = $udpobject.Send($byte,$byte.Length)
-                }
+                    # Write-Verbose "Byte Length: $($byte.Length)"
+                    # $Sent = $udpobject.Send($byte,$byte.Length)
+                # }
 
-                Write-Verbose "Sent via UDP to $($InfluxdbServer) on port $($InfluxdbHTTPPort)."
-            }
-            else
-            {
-                PSUsing ($socket = New-Object System.Net.Sockets.TCPClient) -ScriptBlock {
-                    $socket.connect($InfluxdbServer, $InfluxdbHTTPPort)
-                    PSUsing ($stream = $socket.GetStream()) {
-                        PSUSing($writer = new-object System.IO.StreamWriter($stream)) {
-                            foreach ($metricString in $Metrics)
-                            {
-                                $writer.WriteLine($metricString)
-                            }
-                            $writer.Flush()
-                            Write-Verbose "Sent via TCP to $($InfluxdbServer) on port $($InfluxdbHTTPPort)."
-                        }
-                    }
-                }
-            }
-        }
-        catch
-        {
-            $exceptionText = GetPrettyProblem $_
-            Write-Error "Error sending metrics to the Influxdb Server. Please check your configuration file. `n$exceptionText"
-        }
-    }
-}
+                # Write-Verbose "Sent via UDP to $($InfluxdbServer) on port $($InfluxdbHTTPPort)."
+            # }
+            # else
+            # {
+                # PSUsing ($socket = New-Object System.Net.Sockets.TCPClient) -ScriptBlock {
+                    # $socket.connect($InfluxdbServer, $InfluxdbHTTPPort)
+                    # PSUsing ($stream = $socket.GetStream()) {
+                        # PSUSing($writer = new-object System.IO.StreamWriter($stream)) {
+                            # foreach ($metricString in $Metrics)
+                            # {
+                                # $writer.WriteLine($metricString)
+                            # }
+                            # $writer.Flush()
+                            # Write-Verbose "Sent via TCP to $($InfluxdbServer) on port $($InfluxdbHTTPPort)."
+                        # }
+                    # }
+                # }
+            # }
+        # }
+        # catch
+        # {
+            # $exceptionText = GetPrettyProblem $_
+            # Write-Error "Error sending metrics to the Influxdb Server. Please check your configuration file. `n$exceptionText"
+        # }
+    # }
+# }
 # END ===>>> CHANGE THIS TO SEND TO INFLUXDB
 
 function GetPrettyProblem {
@@ -287,6 +214,8 @@ Function DateTimeToUnixTimestamp([datetime]$DateTime)
 	return [uint64]$UnixTime
 }
 
+# To be compatible with PSv2
+# Code adapted From : https://github.com/yukiusagi2052/PowerShell-InfluxDB
 function Invoke-HttpMethod {
   [CmdletBinding()]
   Param(
@@ -369,23 +298,24 @@ function Invoke-HttpMethod {
         return $results;
     } Else {
       If ($WriteRetryCount -lt $MaxMethodRetry) {
-        Write-Verbose "DB????????????"
+        Write-Verbose "Retry $WriteRetryCount / $MaxMethodRetry"
         Remove-Variable RequestStream
         Remove-Variable BodyStr
         Remove-Variable WebRequest
         #[System.GC]::Collect([System.GC]::MaxGeneration)
         Start-Sleep -Seconds $MethodRetryWaitSecond
       } Else {
-        Write-Verbose "??????????????????????"
+        Write-Verbose "Max Retry Reached !"
       }
     }
   } #For .. (WriteRetry) .. Loop
 }
 
+# Code adapted From : https://github.com/yukiusagi2052/PowerShell-InfluxDB
 Function Invoke-InfluxWriteRaw {
   <#
   .SYNOPSIS
-    ???? InfluxDB ??????
+    Send Metrics to InfluxDB server in Line Protocol
   #>
   [CmdletBinding()]
   Param(
@@ -395,15 +325,13 @@ Function Invoke-InfluxWriteRaw {
     [string]$DbName,
     [string]$Username,
     [string]$Password,
-    # [string]$Series,
-    # [string]$Columns,
-    # [string]$Points
+    [string]$Precision = "s",
     [string]$LineProtocolMeasurements,
 	[switch]$TestMode = $false
   )
   
 	# InfluxDB API URL
-	[String]$resource = $Protocol + "://" + $Server + ":" + $Port + "/write?db=" + $DbName
+	[String]$resource = $Protocol + "://" + $Server + ":" + $Port + "/write?db=" + $DbName + "&precision=" + $Precision
 
 	# Verbose
 	Write-Verbose "Post URI : $resource"
@@ -420,6 +348,7 @@ Function Invoke-InfluxWriteRaw {
 	}
 }
 
+# CleanUp Functions for Line Protocol
 # https://docs.influxdata.com/influxdb/v1.0/write_protocols/line_protocol_tutorial/#special-characters-and-keywords
 Function Influxdb-Quote-Measurement {
 	Param(

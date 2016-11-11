@@ -10,14 +10,11 @@ Function Start-MeasurementsToInfluxdb
     .Parameter Verbose
         Provides Verbose output which is useful for troubleshooting
 
+	.Parameter ConfigFile
+        Set the Path of a specific Config File in XML format (default is Influxdb-Powershell/StatsToInfluxdbConfig.xml)
+
     .Parameter TestMode
         Metrics that would be sent to Influxdb is shown, without sending the metric on to Influxdb.
-
-    .Parameter ExcludePerfCounters
-        Excludes Performance counters defined in XML config
-
-    .Parameter SqlMetrics
-        Includes SQL Metrics defined in XML config
 
     .Example
         PS> Start-MeasurementsToInfluxdb -TestMode
@@ -26,6 +23,11 @@ Function Start-MeasurementsToInfluxdb
 
 	.Example
         PS> Start-MeasurementsToInfluxdb
+
+        Will start the endless loop to send stats to Influxdb
+
+	.Example
+        PS> Start-MeasurementsToInfluxdb -ConfigFile "c:\path_to_confif\StatsToInfluxdbConfig_FR.xml"
 
         Will start the endless loop to send stats to Influxdb
 
@@ -47,16 +49,17 @@ Function Start-MeasurementsToInfluxdb
         [Parameter(Mandatory = $false)]
         [switch]$TestMode,
         [switch]$ExcludePerfCounters = $false,
-        [switch]$SqlMetrics = $false
+		[string]$ConfigFile = $configPath
     )
 
     # Run The Load XML Config Function
-    $Config = Import-XMLConfig -ConfigPath $configPath
+	Write-Verbose "Loading config file from : $($ConfigFile)"
+    $Config = Import-XMLConfig -ConfigPath $ConfigFile
 
     # Get Last Run Time
     $sleep = 0
 
-    $configFileLastWrite = (Get-Item -Path $configPath).LastWriteTime
+    $configFileLastWrite = (Get-Item -Path $ConfigFile).LastWriteTime
 
     if($ExcludePerfCounters -and -not $SqlMetrics) {
         throw "Parameter combination provided will prevent any metrics from being collected"
@@ -204,8 +207,8 @@ Function Start-MeasurementsToInfluxdb
         Invoke-InfluxWriteRaw @sendBulkInfluxdbMetricsParams
 
         # Reloads The Configuration File After the Loop so new counters can be added on the fly
-        if((Get-Item $configPath).LastWriteTime -gt (Get-Date -Date $configFileLastWrite)) {
-            $Config = Import-XMLConfig -ConfigPath $configPath
+        if((Get-Item $ConfigFile).LastWriteTime -gt (Get-Date -Date $configFileLastWrite)) {
+            $Config = Import-XMLConfig -ConfigPath $ConfigFile
         }
 
         $iterationStopWatch.Stop()
