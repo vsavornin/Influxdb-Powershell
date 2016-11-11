@@ -10,7 +10,7 @@ $configPath = [string](Split-Path -Parent $MyInvocation.MyCommand.Definition) + 
 
 $functionsToExport = @(
     'Start-MeasurementsToInfluxdb',
-	'Import-XMLConfig'
+    'Import-XMLConfig'
 )
 
 Export-ModuleMember -Function $functionsToExport

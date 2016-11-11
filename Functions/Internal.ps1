@@ -15,9 +15,9 @@ Function Import-XMLConfig
 
     .Notes
         NAME:      Start-MeasurementsToInfluxdb
-        AUTHOR:	   Vincent SAVORNIN
-		WEBSITE:   https://github.com/vsavornin/Influxdb-Powershell
-		BASED ON:  https://github.com/MattHodge/Graphite-PowerShell-Functions
+        AUTHOR:       Vincent SAVORNIN
+        WEBSITE:   https://github.com/vsavornin/Influxdb-Powershell
+        BASED ON:  https://github.com/MattHodge/Graphite-PowerShell-Functions
 
 #>
     [CmdletBinding()]
@@ -41,7 +41,7 @@ Function Import-XMLConfig
 
     # Get the HostName to use for the metrics from the config file
     $Config.NodeHostName = $xmlfile.Configuration.Influxdb.NodeHostName
-    
+
     # Set the NodeHostName to ComputerName
     if($Config.NodeHostName -eq '$env:COMPUTERNAME')
     {
@@ -63,45 +63,45 @@ Function Import-XMLConfig
     # Convert Value in Configuration File to Bool for showing Verbose Output
     [bool]$Config.ShowOutput = [System.Convert]::ToBoolean($xmlfile.Configuration.Logging.VerboseOutput)
 
-	# Get the Host Tag Name to use for the metrics from the config file
+    # Get the Host Tag Name to use for the metrics from the config file
     $Config.HostTagName = $xmlfile.Configuration.Influxdb.HostTagName
-	
-	# Get the Counter's Instance Tag Name to use for the metrics from the config file
+
+    # Get the Counter's Instance Tag Name to use for the metrics from the config file
     $Config.CounterInstanceTagName = $xmlfile.Configuration.Influxdb.CounterInstanceTagName
-	
-	#Create the Measurements Hash
-	$Config.Measurements = @{}
-	
-	# Loop for each Measurement in configuration file
-	foreach ($measurement in $xmlfile.Configuration.Measurements.Measurement)
+
+    #Create the Measurements Hash
+    $Config.Measurements = @{}
+
+    # Loop for each Measurement in configuration file
+    foreach ($measurement in $xmlfile.Configuration.Measurements.Measurement)
     {
         # Create the Measurement Hash
-		$Config.Measurements[$measurement.Name] = @{}
-		
-		# Retrieve the KeepTotal bool
-		[bool]$Config.Measurements[$measurement.Name].skip_total = [System.Convert]::ToBoolean($measurement.SkipTotal)
-		
-		# Retrieve Tags list into an OrderedDictionary, to preserve the order (https://docs.influxdata.com/influxdb/v1.0/write_protocols/line_protocol_tutorial/)
-		$Config.Measurements[$measurement.Name]["tags"] = New-Object System.Collections.Specialized.OrderedDictionary
-		foreach ($tags in $measurement.MeasurementTags.Tag)
-		{
-			$Config.Measurements[$measurement.Name]["tags"][$tags.Name] = $tags.Value
-		}
-		# Add host tag to each Measurement
-		$Config.Measurements[$measurement.Name]["tags"][$Config.HostTagName] = $Config.NodeHostName
-		
-		# Retrieve Fields list into a Hash
-		$Config.Measurements[$measurement.Name]["fields"] = @{}
-		foreach ($fields in $measurement.MeasurementFields.Field)
-		{
-			$Config.Measurements[$measurement.Name]["fields"][$fields.Name] = $fields.Counter
-		}
+        $Config.Measurements[$measurement.Name] = @{}
+
+        # Retrieve the KeepTotal bool
+        [bool]$Config.Measurements[$measurement.Name].skip_total = [System.Convert]::ToBoolean($measurement.SkipTotal)
+
+        # Retrieve Tags list into an OrderedDictionary, to preserve the order (https://docs.influxdata.com/influxdb/v1.0/write_protocols/line_protocol_tutorial/)
+        $Config.Measurements[$measurement.Name]["tags"] = New-Object System.Collections.Specialized.OrderedDictionary
+        foreach ($tags in $measurement.MeasurementTags.Tag)
+        {
+            $Config.Measurements[$measurement.Name]["tags"][$tags.Name] = $tags.Value
+        }
+        # Add host tag to each Measurement
+        $Config.Measurements[$measurement.Name]["tags"][$Config.HostTagName] = $Config.NodeHostName
+
+        # Retrieve Fields list into a Hash
+        $Config.Measurements[$measurement.Name]["fields"] = @{}
+        foreach ($fields in $measurement.MeasurementFields.Field)
+        {
+            $Config.Measurements[$measurement.Name]["fields"][$fields.Name] = $fields.Counter
+        }
     }
-	
-	# For debug purpose
-	# $Config.Measurements["win_cpu"] | Format-Table | Out-String
-	# $Config.Measurements["win_cpu"]["tags"] | Format-Table | Out-String
-	# $Config.Measurements["win_cpu"]["fields"] | Format-Table | Out-String
+
+    # For debug purpose
+    # $Config.Measurements["win_cpu"] | Format-Table | Out-String
+    # $Config.Measurements["win_cpu"]["tags"] | Format-Table | Out-String
+    # $Config.Measurements["win_cpu"]["fields"] | Format-Table | Out-String
 
     Return $Config
 }
@@ -208,10 +208,10 @@ function StringIsNullOrWhitespace([string] $string)
 
 Function DateTimeToUnixTimestamp([datetime]$DateTime)
 {
-	$utcDate = $DateTime.ToUniversalTime()
-	# Convert to a Unix time without any rounding
-	[uint64]$UnixTime = [double]::Parse((Get-Date -Date $utcDate -UFormat %s))
-	return [uint64]$UnixTime
+    $utcDate = $DateTime.ToUniversalTime()
+    # Convert to a Unix time without any rounding
+    [uint64]$UnixTime = [double]::Parse((Get-Date -Date $utcDate -UFormat %s))
+    return [uint64]$UnixTime
 }
 
 # To be compatible with PSv2
@@ -223,11 +223,11 @@ function Invoke-HttpMethod {
       [string] $Method,
       [string] $Body
   )
-  
+
   [Bool] $MethodResult = $True
   [Int] $MethodRetryWaitSecond = 10
   [Int] $MaxMethodRetry = 6
-  
+
   For($WriteRetryCount=0; $WriteRetryCount -lt $MaxMethodRetry; $WriteRetryCount++){
 
     $WebRequest = [System.Net.WebRequest]::Create($URI)
@@ -251,7 +251,7 @@ function Invoke-HttpMethod {
       $MethodResult = $True
 
     } Catch {
-	  # $Error | Get-Member
+      # $Error | Get-Member
       Write-Error $_.Exception.ErrorRecord
       $MethodResult = $False
     } Finally {
@@ -327,51 +327,50 @@ Function Invoke-InfluxWriteRaw {
     [string]$Password,
     [string]$Precision = "s",
     [string]$LineProtocolMeasurements,
-	[switch]$TestMode = $false
+    [switch]$TestMode = $false
   )
-  
-	# InfluxDB API URL
-	[String]$resource = $Protocol + "://" + $Server + ":" + $Port + "/write?db=" + $DbName + "&precision=" + $Precision
 
-	# Verbose
-	Write-Verbose "Post URI : $resource"
-	Write-Verbose "Post Data: $LineProtocolMeasurements"
-	
-    if($TestMode -eq $False) 
-	{
-		# Post to InfluxDB
-		Invoke-HttpMethod -Uri $resource -Method POST -Body $LineProtocolMeasurements -Debug
-	}
-	else
-	{
-		Write-Verbose "TestMode is activated : nothing is sent to InfluxDB"
-	}
+    # InfluxDB API URL
+    [String]$resource = $Protocol + "://" + $Server + ":" + $Port + "/write?db=" + $DbName + "&precision=" + $Precision
+
+    # Verbose
+    Write-Verbose "Post URI : $resource"
+    Write-Verbose "Post Data: $LineProtocolMeasurements"
+
+    if($TestMode -eq $False)
+    {
+        # Post to InfluxDB
+        Invoke-HttpMethod -Uri $resource -Method POST -Body $LineProtocolMeasurements -Debug
+    }
+    else
+    {
+        Write-Verbose "TestMode is activated : nothing is sent to InfluxDB"
+    }
 }
 
 # CleanUp Functions for Line Protocol
 # https://docs.influxdata.com/influxdb/v1.0/write_protocols/line_protocol_tutorial/#special-characters-and-keywords
 Function Influxdb-Quote-Measurement {
-	Param(
-		[string]$InputString
-	)
-	$QuotedString = $InputString.trim() -replace "((?:[, ])\w*)",'\$1'
-	return [string]$QuotedString
+    Param(
+        [string]$InputString
+    )
+    $QuotedString = $InputString.trim() -replace "((?:[, ])\w*)",'\$1'
+    return [string]$QuotedString
 }
 
 Function Influxdb-Quote-Tag-FieldKey {
-	Param(
-		[string]$InputString
-	)
-	$QuotedString = $InputString.trim() -replace "((?:[, =])\w*)",'\$1'
-	return [string]$QuotedString
+    Param(
+        [string]$InputString
+    )
+    $QuotedString = $InputString.trim() -replace "((?:[, =])\w*)",'\$1'
+    return [string]$QuotedString
 }
 
 Function Influxdb-Quote-FieldVal {
-	Param(
-		[string]$InputString
-	)
-	# $QuotedString = $InputString.trim() -replace "((?:[`"])\w*)",'\$1'
-	$QuotedString = $InputString.trim()
-	return [string]$QuotedString
+    Param(
+        [string]$InputString
+    )
+    # $QuotedString = $InputString.trim() -replace "((?:[`"])\w*)",'\$1'
+    $QuotedString = $InputString.trim()
+    return [string]$QuotedString
 }
-
