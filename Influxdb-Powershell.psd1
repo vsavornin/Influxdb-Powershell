@@ -15,7 +15,7 @@ ModuleVersion = '1.0.0'
 GUID = '94de0e0a-8107-4e88-abd1-79cb71613922'
 
 # Author of this module
-Author = 'Matthew Hodgkins'
+Author = 'Vincent SAVORNIN'
 
 # Company or vendor of this module
 CompanyName = 'https://github.com/vsavornin/Influxdb-Powershell'
