@@ -173,7 +173,7 @@ If you want to remove a service, read the NSSM documentation [http://nssm.cc/com
 
 There are several functions that are exposed by the module which are available to use in an ad-hoc manner.
 
-For a list of functions in the module, run `Get-Command -Module INfluxdb-PowerShell`. For full help for these functions run `Get-Help | <Function Name>`
+For a list of functions in the module, run `Get-Command -Module Influxdb-PowerShell`. For full help for these functions run `Get-Help | <Function Name>`
 
 Function Name | Description
 --- | ---
