@@ -69,12 +69,20 @@ Example :
         </MeasurementTags>
         <MeasurementFields>
             <Field Name="Percent_Idle_Time" Counter="\Processeur(*)\% d’inactivité"/>
-            <Field Name="Percent_Interrupt_Time" Counter="\Processeur(*)\% temps d’interruption"/>
-            <Field Name="Percent_Privileged_Time" Counter="\Processeur(*)\% temps privilégié"/>
             <Field Name="Percent_Processor_Time" Counter="\Processeur(*)\% temps processeur"/>
             <Field Name="Percent_User_Time" Counter="\Processeur(*)\% temps utilisateur"/>
         </MeasurementFields>
         <SkipTotal>False</SkipTotal>
+    </Measurement>
+    <Measurement Name="win_disk">
+        <MeasurementTags>
+            <Tag Name="objectname" Value="LogicalDisk"/>
+        </MeasurementTags>
+        <MeasurementFields>
+            <Field Name="Free_Megabytes" Counter="\Disque logique(*)\Mégaoctets libres"/>
+            <Field Name="Percent_Idle_Time" Counter="\Disque logique(*)\% d’inactivité"/>
+        </MeasurementFields>
+        <SkipTotal>True</SkipTotal>
     </Measurement>
 </Measurements>
 ```
