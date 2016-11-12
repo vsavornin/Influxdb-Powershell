@@ -30,9 +30,7 @@ Based on :
 ## Installation
 
 1. Download the repository and place into a PowerShell Modules directory called **Influxdb-Powershell**. The module directories can be found by running `$env:PSModulePath` in PowerShell. For example, `C:\Program Files\WindowsPowerShell\Modules\Influxdb-PowerShell`
-2. Verify your folder structure looks like this, with the *.psd1* and *.psm1* files inside the **Influxdb-Powershell** folder
-
-[comment]: < ![alt text](http://i.imgur.com/4wE9Xq5.jpg "Start-MeasurementsToInfluxdb with Verbose Output") >
+2. Verify your folder structure, with the *.psd1* and *.psm1* files inside the **Influxdb-Powershell** folder
 3. Make sure the files are un-blocked by right clicking on them and going to properties.
 4. Modify the *StatsToInfluxdbConfig.xml* configuration file. Instructions [here](#config).
 5. Open PowerShell and ensure you set your Execution Policy to allow scripts be run. For example `Set-ExecutionPolicy RemoteSigned`.
