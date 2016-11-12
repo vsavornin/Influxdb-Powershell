@@ -49,7 +49,7 @@ Configuration Name | Description
 --- | ---
 InfluxdbHTTPProtocol | The protocol used to communicate with InfluxDB REST API. `http` or `https`
 InfluxdbServer | The server name or IP adress where the InfluxDB database server is running.
-InfluxdbHTTPPort | The port number for InfluxDB REST API. Its default port number is 8086.
+InfluxdbHTTPPort | The port number for InfluxDB REST API. Its default port number is `8086`.
 InfluxdbDatabase | The Influxdb Database where the metrics are sent.
 NodeHostName | This allows you to override the hostname of the server before sending the metrics on to INfluxDB. Default is use `$env:COMPUTERNAME`, which will use the local computer name.
 MetricSendIntervalSeconds | The interval to send metrics to InfluxDB. I recommend 10 seconds or greater. The more metrics you are collecting the longer it takes to send them to the InfluxDB server. You can see how long it takes to send the metrics each time the loop runs by using running the `Start-MeasurementsToInfluxdb` function and having *VerboseOutput* set to *True*.
@@ -87,28 +87,20 @@ You can get the list of performance counters available on your system:
 
 I have included some basic performance counters in the configuration file. Asterisks can be used as a wildcard for instance.
 
+
 ##### Measurement Section (`<Measurement Name="">`)
 Each InfluxDB Measurement has its configuration section.
 
 
-Specify the Name of the Measurement where all the Fields specified in the section wil be sent :
+Specify the Name of the Measurement where all the Tags and Fields specified in this section will be sent :
 `<Measurement Name="win_cpu">`
 Here, the metrics will be written to the win_cpu measurement of the `InfluxdbDatabase`
 
-###### MeasurementTags Section (`<MeasurementTags>`)
-
-The tag objectname describes the Counter Object from which the metrics are taken.
-If you get counter `\Processor(*)\% idle time`, you might set it to `<Tag Name="objectname" Value="Processor"/>`.
-
-You might add as many Tags you want (**not tested yet**)
-
-###### MeasurementFields Section (`<MeasurementFields>`)
-
-Here you list all the Fields you want to feed the Measurement with. You must configure the Field's Name and it's Value with a Performance Counter Path : `<Field Name="Percent_User_Time" Counter="\Processeur(*)\% temps utilisateur"/>`
-
-###### SkipTotal option (`<SkipTotal>`)
-If you want to skip the `_Total` instance of the Performance Counter, set this option to `True`.
-Default is `False`
+Sub-Section | XML Tag | Description
+--- | --- | ---
+MeasurementTags | `<MeasurementTags>` | The tag objectname describes the Counter Object from which the metrics are taken. If you get counter `\Processor(*)\% idle time`, you might set it to `<Tag Name="objectname" Value="Processor"/>`.<br>You might add as many Tags you want (not tested yet)
+MeasurementFields | `<MeasurementFields>` | Here you list all the Fields you want to feed the Measurement with.<br>You must configure the Field's Name and it's Value with a Performance Counter Path : `<Field Name="Percent_User_Time" Counter="\Processeur(*)\% temps utilisateur"/>`
+SkipTotal | `<SkipTotal>` | If you want to skip the `_Total` instance of the Performance Counters, set this option to `True`.<br>Default is `False`.
 
 #### Logging Configuration Section
 
