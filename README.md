@@ -58,7 +58,26 @@ HostTagName | The tag name sent to influxDB for the NodeHostName value. Default 
 CounterInstanceTagName | The tag name sent to influxDB for the Instance value of a Windows Performance Counter. Default is `instance` (compatible with Influxdata Telegraf).
 
 
-#### Measurement Section (`<Measurement>`)
+#### Measurements Section (`<Measurements>`)
+
+Example :
+```xml
+<Measurements>
+    <Measurement Name="win_cpu">
+        <MeasurementTags>
+            <Tag Name="objectname" Value="Processor"/>
+        </MeasurementTags>
+        <MeasurementFields>
+            <Field Name="Percent_Idle_Time" Counter="\Processeur(*)\% d’inactivité"/>
+            <Field Name="Percent_Interrupt_Time" Counter="\Processeur(*)\% temps d’interruption"/>
+            <Field Name="Percent_Privileged_Time" Counter="\Processeur(*)\% temps privilégié"/>
+            <Field Name="Percent_Processor_Time" Counter="\Processeur(*)\% temps processeur"/>
+            <Field Name="Percent_User_Time" Counter="\Processeur(*)\% temps utilisateur"/>
+        </MeasurementFields>
+        <SkipTotal>False</SkipTotal>
+    </Measurement>
+</Measurements>
+```
 
 This section lists the performance counters you want the machine to send to specific InfluxDB database measurement.
 
@@ -68,25 +87,9 @@ You can get the list of performance counters available on your system:
 
 I have included some basic performance counters in the configuration file. Asterisks can be used as a wildcard for instance.
 
-##### Measurements Section (`<Measurement Name="">`)
+##### Measurement Section (`<Measurement Name="">`)
 Each InfluxDB Measurement has its configuration section.
 
-Example :
-```xml
-<Measurement Name="win_cpu">
-    <MeasurementTags>
-        <Tag Name="objectname" Value="Processor"/>
-    </MeasurementTags>
-    <MeasurementFields>
-        <Field Name="Percent_Idle_Time" Counter="\Processeur(*)\% d’inactivité"/>
-        <Field Name="Percent_Interrupt_Time" Counter="\Processeur(*)\% temps d’interruption"/>
-        <Field Name="Percent_Privileged_Time" Counter="\Processeur(*)\% temps privilégié"/>
-        <Field Name="Percent_Processor_Time" Counter="\Processeur(*)\% temps processeur"/>
-        <Field Name="Percent_User_Time" Counter="\Processeur(*)\% temps utilisateur"/>
-    </MeasurementFields>
-    <SkipTotal>False</SkipTotal>
-</Measurement>
-```
 
 Specify the Name of the Measurement where all the Fields specified in the section wil be sent :
 `<Measurement Name="win_cpu">`
