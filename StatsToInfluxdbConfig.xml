@@ -2,7 +2,7 @@
 <Configuration>
     <Influxdb>
         <InfluxdbHTTPProtocol>http</InfluxdbHTTPProtocol>
-        <InfluxdbServer>asintlhp01.gmcloudhp.ggl.inet</InfluxdbServer>
+        <InfluxdbServer>hostname.local</InfluxdbServer>
         <InfluxdbHTTPPort>8086</InfluxdbHTTPPort>
         <InfluxdbDatabase>win_powershell</InfluxdbDatabase>
         <NodeHostName>$env:COMPUTERNAME</NodeHostName>
